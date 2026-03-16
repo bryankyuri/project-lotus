@@ -1,5 +1,6 @@
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, MoreVertical, Bookmark } from 'lucide-react'
 import type { SlotType, LoggedFood } from '../../store/localStorage'
 import { useTranslation } from 'react-i18next'
 import { portionKey } from '../../utils/portionKey'
@@ -9,6 +10,7 @@ interface MealSlotCardProps {
   readonly foods: LoggedFood[]
   readonly onAddFood: () => void
   readonly onRemoveFood: (index: number) => void
+  readonly onSaveMeal?: (slot: SlotType, foods: LoggedFood[]) => void
 }
 
 const slotTranslationKey: Record<SlotType, string> = {
@@ -30,8 +32,23 @@ export function MealSlotCard({
   foods,
   onAddFood,
   onRemoveFood,
+  onSaveMeal,
 }: MealSlotCardProps) {
   const { t } = useTranslation()
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!showMenu) return
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showMenu])
 
   const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0)
   const totalProtein = foods.reduce((sum, f) => sum + f.protein, 0)
@@ -52,12 +69,39 @@ export function MealSlotCard({
             </span>
           )}
         </div>
-        <button
-          onClick={onAddFood}
-          className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center bg-gradient-primary-hover transition-colors shadow-sm"
-        >
-          <Plus size={16} className="text-white" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Kebab menu — only visible when there are foods to save */}
+          {foods.length > 0 && onSaveMeal && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors"
+              >
+                <MoreVertical size={16} className="text-text-secondary" />
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 top-9 z-30 bg-white rounded-xl shadow-lg border border-border py-1 min-w-40">
+                  <button
+                    onClick={() => {
+                      onSaveMeal(slot, foods)
+                      setShowMenu(false)
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray-50 transition-colors"
+                  >
+                    <Bookmark size={14} />
+                    {t('templates.save_meal')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            onClick={onAddFood}
+            className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center bg-gradient-primary-hover transition-colors shadow-sm"
+          >
+            <Plus size={16} className="text-white" />
+          </button>
+        </div>
       </div>
 
       {/* Food list */}

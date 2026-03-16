@@ -323,5 +323,31 @@
     "language": "语言",
     "language_desc": "选择您偏好的语言",
     "settings_desc": "语言、主题和偏好设置"
+  },
+  "templates": {
+    "title": "我的模板",
+    "saved_meals": "已保存的餐食",
+    "day_templates": "日模板",
+    "week_templates": "周模板",
+    "save_meal": "保存为餐食",
+    "save_day": "保存当天",
+    "save_week": "保存本周",
+    "load_day": "加载日计划",
+    "load_week": "加载周计划",
+    "name_label": "模板名称",
+    "name_placeholder": "例如：我的健康早餐",
+    "replace_confirm": "您想如何应用此模板？",
+    "add_to_existing": "添加到现有",
+    "replace": "替换",
+    "replace_week_confirm": "这将替换整周的计划。继续吗？",
+    "empty_meals": "还没有保存的餐食",
+    "empty_days": "还没有日模板",
+    "empty_weeks": "还没有周模板",
+    "foods_count": "种食物",
+    "days_filled": "天已计划",
+    "total": "合计",
+    "per_day": "天",
+    "saved_success": "保存成功！",
+    "rename": "重命名模板"
   }
 }

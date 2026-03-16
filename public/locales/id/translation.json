@@ -323,5 +323,31 @@
     "language": "Bahasa",
     "language_desc": "Pilih bahasa yang kamu inginkan",
     "settings_desc": "Bahasa, tema dan preferensi"
+  },
+  "templates": {
+    "title": "Template Saya",
+    "saved_meals": "Makanan Tersimpan",
+    "day_templates": "Template Harian",
+    "week_templates": "Template Mingguan",
+    "save_meal": "Simpan sebagai Makanan",
+    "save_day": "Simpan Hari",
+    "save_week": "Simpan Minggu",
+    "load_day": "Muat Hari",
+    "load_week": "Muat Minggu",
+    "name_label": "Nama Template",
+    "name_placeholder": "cth. Sarapan Sehat Saya",
+    "replace_confirm": "Bagaimana Anda ingin menerapkan template ini?",
+    "add_to_existing": "Tambah ke yang Ada",
+    "replace": "Ganti",
+    "replace_week_confirm": "Ini akan mengganti seluruh rencana minggu. Lanjutkan?",
+    "empty_meals": "Belum ada makanan tersimpan",
+    "empty_days": "Belum ada template harian",
+    "empty_weeks": "Belum ada template mingguan",
+    "foods_count": "makanan",
+    "days_filled": "hari direncanakan",
+    "total": "Total",
+    "per_day": "hari",
+    "saved_success": "Berhasil disimpan!",
+    "rename": "Ubah Nama Template"
   }
 }

@@ -323,5 +323,31 @@
     "language": "Langue",
     "language_desc": "Choisissez votre langue préférée",
     "settings_desc": "Langue, thème et préférences"
+  },
+  "templates": {
+    "title": "Mes modèles",
+    "saved_meals": "Repas enregistrés",
+    "day_templates": "Modèles de jour",
+    "week_templates": "Modèles de semaine",
+    "save_meal": "Enregistrer comme repas",
+    "save_day": "Enregistrer le jour",
+    "save_week": "Enregistrer la semaine",
+    "load_day": "Charger un jour",
+    "load_week": "Charger une semaine",
+    "name_label": "Nom du modèle",
+    "name_placeholder": "ex. Mon petit-déjeuner sain",
+    "replace_confirm": "Comment souhaitez-vous appliquer ce modèle ?",
+    "add_to_existing": "Ajouter à l'existant",
+    "replace": "Remplacer",
+    "replace_week_confirm": "Cela remplacera le plan de toute la semaine. Continuer ?",
+    "empty_meals": "Aucun repas enregistré",
+    "empty_days": "Aucun modèle de jour",
+    "empty_weeks": "Aucun modèle de semaine",
+    "foods_count": "aliments",
+    "days_filled": "jours planifiés",
+    "total": "Total",
+    "per_day": "jour",
+    "saved_success": "Enregistré avec succès !",
+    "rename": "Renommer le modèle"
   }
 }

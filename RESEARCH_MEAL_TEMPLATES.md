@@ -367,3 +367,344 @@ This system gives users a **3-tier reusability hierarchy**:
 - 📆 **Week Template** → "This is my standard week" → apply to any week
 
 All stored in localStorage, consistent with the existing architecture. No backend needed.
+
+---
+
+## 9. Sequence Diagrams
+
+### 9A. Save Slot as Saved Meal
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant MSC as MealSlotCard
+    participant STS as SaveTemplateSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+
+    User->>PC: Views day with foods in Breakfast
+    User->>MSC: Taps ⋯ (kebab menu) on Breakfast header
+    MSC->>MSC: Shows context menu
+    User->>MSC: Selects "Save as Meal"
+    MSC->>PC: onSaveMeal(slot, foods[])
+    PC->>STS: Opens SaveTemplateSheet(type='meal', slot, foods)
+    STS->>STS: Renders name input + food preview
+    User->>STS: Types "My Power Breakfast"
+    User->>STS: Taps "Save"
+    STS->>UT: saveMeal({ name, slot, foods })
+    UT->>UT: Generates id = 'sm_' + Date.now()
+    UT->>UT: Computes totalCalories/protein/carbs/fat
+    UT->>LS: Read mp_saved_meals[]
+    LS-->>UT: existing SavedMeal[]
+    UT->>LS: Write [...existing, newSavedMeal]
+    UT-->>STS: success
+    STS->>PC: onClose()
+    PC->>User: Shows toast "Meal saved!"
+```
+
+### 9B. Save Day as Day Template
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant STS as SaveTemplateSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+
+    User->>PC: Views selected day (e.g. Monday Mar 16)
+    Note over PC: Day has foods in breakfast, lunch, dinner, snack
+    User->>PC: Taps ⋯ menu on day area
+    PC->>PC: Shows context menu
+    User->>PC: Selects "Save Day as Template"
+    PC->>PC: Collects dayLog { breakfast[], lunch[], dinner[], snack[] }
+    PC->>STS: Opens SaveTemplateSheet(type='day', dayLog)
+    STS->>STS: Renders name input + 4-slot summary preview
+    User->>STS: Types "Cutting Day"
+    User->>STS: Taps "Save"
+    STS->>UT: saveDayTemplate({ name, breakfast, lunch, dinner, snack })
+    UT->>UT: Generates id = 'dt_' + Date.now()
+    UT->>UT: Computes totals across all 4 slots
+    UT->>LS: Read mp_day_templates[]
+    LS-->>UT: existing DayTemplate[]
+    UT->>LS: Write [...existing, newDayTemplate]
+    UT-->>STS: success
+    STS->>PC: onClose()
+    PC->>User: Shows toast "Day template saved!"
+```
+
+### 9C. Save Week as Week Template
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant STS as SaveTemplateSheet
+    participant WP as useWeekPlan
+    participant UT as useTemplates
+    participant LS as localStorage
+
+    User->>PC: Views current week (Mon–Sun)
+    User->>PC: Taps "Save Week" button in week header
+    PC->>WP: Read weekLogs (7 days of DayLog)
+    WP-->>PC: weekLogs[]
+    PC->>STS: Opens SaveTemplateSheet(type='week', weekLogs)
+    STS->>STS: Renders name input + 7-day overview
+    User->>STS: Types "Balanced Bulk Week"
+    User->>STS: Taps "Save"
+    STS->>UT: saveWeekTemplate({ name, days: { mon..sun } })
+    UT->>UT: Generates id = 'wt_' + Date.now()
+    UT->>UT: Maps each day's DayLog → DayTemplate (strip date)
+    UT->>UT: Computes weekly totalCalories
+    UT->>LS: Read mp_week_templates[]
+    LS-->>UT: existing WeekTemplate[]
+    UT->>LS: Write [...existing, newWeekTemplate]
+    UT-->>STS: success
+    STS->>PC: onClose()
+    PC->>User: Shows toast "Week template saved!"
+```
+
+### 9D. Load Saved Meal into Slot
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant FM as FoodModal
+    participant FAS as FoodAddSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+    participant DL as useDayLog
+
+    User->>PC: Taps "+" on Breakfast card
+    PC->>FM: Opens FoodModal(slot='breakfast')
+    FM->>FAS: Renders FoodAddSheet
+    FAS->>FAS: Shows tabs: [Search] [Saved Meals]
+    User->>FAS: Taps "Saved Meals" tab
+    FAS->>UT: getSavedMeals(slot='breakfast')
+    UT->>LS: Read mp_saved_meals[]
+    LS-->>UT: all SavedMeal[]
+    UT->>UT: Filter where meal.slot === 'breakfast'
+    UT-->>FAS: filteredMeals[]
+    FAS->>FAS: Renders list of saved meals with calorie info
+    User->>FAS: Taps "My Power Breakfast" (420 kcal)
+    FAS->>PC: onSelectSavedMeal(savedMeal)
+    PC->>DL: addFood('breakfast', food) for each food in savedMeal.foods
+    loop For each food in SavedMeal.foods
+        DL->>LS: Append food to dayLog.breakfast
+    end
+    DL-->>PC: Updated dayLog
+    PC->>FM: Close modal
+    FM->>PC: onClose()
+    PC->>User: Breakfast card shows all added foods
+```
+
+### 9E. Load Day Template into Selected Day
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant LTS as LoadTemplateSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+    participant DL as useDayLog
+
+    User->>PC: Taps ⋯ menu on selected day
+    User->>PC: Selects "Load Day Template"
+    PC->>LTS: Opens LoadTemplateSheet(type='day')
+    LTS->>UT: getDayTemplates()
+    UT->>LS: Read mp_day_templates[]
+    LS-->>UT: DayTemplate[]
+    UT-->>LTS: allDayTemplates[]
+    LTS->>LTS: Renders list with calorie summaries
+    User->>LTS: Taps "Cutting Day" (1800 kcal)
+    LTS->>LTS: Shows confirmation dialog
+
+    alt User chooses "Replace"
+        User->>LTS: Taps "Replace"
+        LTS->>PC: onApplyDayTemplate(template, mode='replace')
+        PC->>DL: clearDayLog(selectedDate)
+        DL->>LS: Delete dayLog[selectedDate]
+        PC->>DL: setDayLog({ date, ...template slots })
+        DL->>LS: Write new dayLog
+    else User chooses "Add to Existing"
+        User->>LTS: Taps "Add to Existing"
+        LTS->>PC: onApplyDayTemplate(template, mode='append')
+        loop For each slot (breakfast, lunch, dinner, snack)
+            loop For each food in template[slot]
+                PC->>DL: addFood(slot, food)
+                DL->>LS: Append food to dayLog[slot]
+            end
+        end
+    end
+
+    DL-->>PC: Updated dayLog
+    LTS->>PC: onClose()
+    PC->>User: All 4 meal slot cards reflect template foods
+```
+
+### 9F. Load Week Template into Current Week
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant LTS as LoadTemplateSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+    participant WP as useWeekPlan
+
+    User->>PC: Taps "Load Week Template" in week header
+    PC->>LTS: Opens LoadTemplateSheet(type='week')
+    LTS->>UT: getWeekTemplates()
+    UT->>LS: Read mp_week_templates[]
+    LS-->>UT: WeekTemplate[]
+    UT-->>LTS: allWeekTemplates[]
+    LTS->>LTS: Renders list with kcal/day summaries
+    User->>LTS: Taps "Balanced Bulk Week"
+    LTS->>LTS: Shows confirmation "Replace entire week?"
+    User->>LTS: Confirms "Replace"
+    LTS->>PC: onApplyWeekTemplate(template)
+
+    PC->>WP: Get weekDates[] (Mon–Sun date keys)
+    WP-->>PC: ['2026-03-16', ..., '2026-03-22']
+
+    loop For each day (mon→sun, i = 0..6)
+        PC->>PC: dayTemplate = template.days[dayKey]
+        alt dayTemplate exists
+            PC->>LS: Write dayLog { date: weekDates[i], ...dayTemplate slots }
+        else dayTemplate is null
+            PC->>LS: Clear dayLog[weekDates[i]]
+        end
+    end
+
+    LS-->>PC: All 7 days updated
+    LTS->>PC: onClose()
+    PC->>PC: Re-renders week view
+    PC->>User: All 7 days reflect the week template
+```
+
+### 9G. Manage Templates (Templates Page)
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PC as PlanPage
+    participant Nav as Router
+    participant TP as TemplatesPage
+    participant UT as useTemplates
+    participant LS as localStorage
+
+    User->>PC: Taps 📋 "My Templates" button
+    PC->>Nav: navigate('/templates')
+    Nav->>TP: Renders TemplatesPage
+
+    TP->>TP: Default tab = "Saved Meals"
+    TP->>UT: getSavedMeals()
+    UT->>LS: Read mp_saved_meals[]
+    LS-->>UT: SavedMeal[]
+    UT-->>TP: savedMeals[]
+    TP->>User: Renders list of SavedMealCards
+
+    Note over User,TP: User switches to "Day" tab
+    User->>TP: Taps "Day" tab
+    TP->>UT: getDayTemplates()
+    UT->>LS: Read mp_day_templates[]
+    LS-->>UT: DayTemplate[]
+    UT-->>TP: dayTemplates[]
+    TP->>User: Renders list of DayTemplateCards
+
+    Note over User,TP: User deletes a template
+    User->>TP: Taps ⋯ on "Old Cutting Day"
+    TP->>TP: Shows context menu
+    User->>TP: Selects "Delete"
+    TP->>TP: Shows confirmation dialog
+    User->>TP: Confirms delete
+    TP->>UT: deleteDayTemplate(id)
+    UT->>LS: Read mp_day_templates[]
+    LS-->>UT: DayTemplate[]
+    UT->>UT: Filter out template with matching id
+    UT->>LS: Write filtered DayTemplate[]
+    UT-->>TP: success
+    TP->>User: Card removed with animation
+```
+
+### 9H. Edit / Rename a Template
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant TP as TemplatesPage
+    participant STS as SaveTemplateSheet
+    participant UT as useTemplates
+    participant LS as localStorage
+
+    User->>TP: Taps ⋯ on "My Power Breakfast"
+    TP->>TP: Shows context menu [Edit, Delete]
+    User->>TP: Selects "Edit"
+    TP->>STS: Opens SaveTemplateSheet(mode='edit', template)
+    STS->>STS: Pre-fills name + shows food list
+    User->>STS: Renames to "High Protein Breakfast"
+    User->>STS: Taps "Save"
+    STS->>UT: updateSavedMeal(id, { name: "High Protein Breakfast" })
+    UT->>LS: Read mp_saved_meals[]
+    LS-->>UT: SavedMeal[]
+    UT->>UT: Find by id, merge updated fields
+    UT->>LS: Write updated SavedMeal[]
+    UT-->>STS: success
+    STS->>TP: onClose()
+    TP->>User: Card reflects new name
+```
+
+### 9I. Complete User Journey — End to End
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant PP as PlanPage
+    participant TP as TemplatesPage
+    participant LS as localStorage
+
+    Note over User,LS: === WEEK 1: Building templates ===
+
+    User->>PP: Plans Monday meals manually
+    User->>PP: Plans full week Mon–Sun
+    User->>PP: Saves Breakfast as "Power Breakfast"
+    PP->>LS: Store SavedMeal
+    User->>PP: Saves Monday as "Cutting Day"
+    PP->>LS: Store DayTemplate
+    User->>PP: Saves full week as "Cut Week"
+    PP->>LS: Store WeekTemplate
+
+    Note over User,LS: === WEEK 2: Reusing templates ===
+
+    User->>PP: Navigates to next week
+    User->>PP: Loads "Cut Week" template
+    PP->>LS: Read WeekTemplate → apply to 7 days
+    LS-->>PP: All 7 days populated
+    User->>PP: Wants to change Wednesday lunch
+    User->>PP: Removes existing Wednesday lunch foods
+    User->>PP: Adds new foods manually
+    User->>PP: Saves Wednesday as "Rest Day"
+    PP->>LS: Store new DayTemplate
+
+    Note over User,LS: === WEEK 3: Mix and match ===
+
+    User->>PP: Loads "Cut Week" for the week
+    PP->>LS: Apply WeekTemplate
+    User->>PP: Replaces Wednesday with "Rest Day" template
+    PP->>LS: Apply DayTemplate to Wednesday
+    User->>PP: For Saturday breakfast, loads "Power Breakfast"
+    PP->>LS: Apply SavedMeal to Saturday breakfast
+
+    Note over User,LS: === Managing templates ===
+
+    User->>PP: Taps 📋 My Templates
+    PP->>TP: Navigate to /templates
+    User->>TP: Renames, deletes, reviews templates
+    TP->>LS: CRUD operations
+    User->>TP: Taps ← Back
+    TP->>PP: Navigate back to /plan
+```

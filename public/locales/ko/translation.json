@@ -323,5 +323,31 @@
     "language": "언어",
     "language_desc": "원하는 언어를 선택하세요",
     "settings_desc": "언어, 테마 및 환경설정"
+  },
+  "templates": {
+    "title": "내 템플릿",
+    "saved_meals": "저장된 식사",
+    "day_templates": "일일 템플릿",
+    "week_templates": "주간 템플릿",
+    "save_meal": "식사로 저장",
+    "save_day": "하루 저장",
+    "save_week": "주간 저장",
+    "load_day": "하루 불러오기",
+    "load_week": "주간 불러오기",
+    "name_label": "템플릿 이름",
+    "name_placeholder": "예: 나의 건강한 아침",
+    "replace_confirm": "이 템플릿을 어떻게 적용하시겠습니까?",
+    "add_to_existing": "기존에 추가",
+    "replace": "교체",
+    "replace_week_confirm": "전체 주간 계획이 교체됩니다. 계속하시겠습니까?",
+    "empty_meals": "저장된 식사가 없습니다",
+    "empty_days": "일일 템플릿이 없습니다",
+    "empty_weeks": "주간 템플릿이 없습니다",
+    "foods_count": "개 음식",
+    "days_filled": "일 계획됨",
+    "total": "합계",
+    "per_day": "일",
+    "saved_success": "저장되었습니다!",
+    "rename": "템플릿 이름 변경"
   }
 }

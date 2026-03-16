@@ -323,5 +323,31 @@
     "language": "Idioma",
     "language_desc": "Elige tu idioma preferido",
     "settings_desc": "Idioma, tema y preferencias"
+  },
+  "templates": {
+    "title": "Mis Plantillas",
+    "saved_meals": "Comidas Guardadas",
+    "day_templates": "Plantillas de Día",
+    "week_templates": "Plantillas de Semana",
+    "save_meal": "Guardar como Comida",
+    "save_day": "Guardar Día",
+    "save_week": "Guardar Semana",
+    "load_day": "Cargar Día",
+    "load_week": "Cargar Semana",
+    "name_label": "Nombre de la Plantilla",
+    "name_placeholder": "ej. Mi Desayuno Saludable",
+    "replace_confirm": "¿Cómo deseas aplicar esta plantilla?",
+    "add_to_existing": "Agregar al Existente",
+    "replace": "Reemplazar",
+    "replace_week_confirm": "Esto reemplazará el plan de toda la semana. ¿Continuar?",
+    "empty_meals": "No hay comidas guardadas",
+    "empty_days": "No hay plantillas de día",
+    "empty_weeks": "No hay plantillas de semana",
+    "foods_count": "alimentos",
+    "days_filled": "días planificados",
+    "total": "Total",
+    "per_day": "día",
+    "saved_success": "¡Guardado exitosamente!",
+    "rename": "Renombrar Plantilla"
   }
 }

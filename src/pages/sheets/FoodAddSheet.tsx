@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, Scale, Heart } from "lucide-react";
+import { Search, Scale, Heart, Bookmark } from "lucide-react";
 import {
   useFoodSearch,
   useFoodDetail,
@@ -13,7 +13,7 @@ import {
   EmptyState,
   Button,
 } from "../../components/ui";
-import type { LoggedFood } from "../../store/localStorage";
+import type { LoggedFood, SavedMeal } from "../../store/localStorage";
 import type { FoodPortion } from "../../services/api";
 import { portionKey } from "../../utils/portionKey";
 
@@ -21,9 +21,13 @@ const CUSTOM_PORTION = "custom" as const;
 
 interface FoodAddSheetProps {
   readonly onSelect: (food: LoggedFood) => void;
+  /** Optional: saved meals for current slot */
+  readonly savedMeals?: SavedMeal[];
+  /** Optional: callback when a saved meal is selected */
+  readonly onSelectSavedMeal?: (meal: SavedMeal) => void;
 }
 
-export function FoodAddSheet({ onSelect }: FoodAddSheetProps) {
+export function FoodAddSheet({ onSelect, savedMeals, onSelectSavedMeal }: FoodAddSheetProps) {
   const { t } = useTranslation();
 
   // Search state
@@ -314,6 +318,33 @@ export function FoodAddSheet({ onSelect }: FoodAddSheetProps) {
           </div>
         ) : (
           <div className="overflow-y-auto md:h-[500px] h-[65vh] no-scrollbar">
+            {/* Saved Meals — shown when there are saved meals for this slot */}
+            {savedMeals && savedMeals.length > 0 && onSelectSavedMeal && (
+              <div className="mb-4">
+                <div className="flex items-center gap-1.5 mb-2 px-1">
+                  <Bookmark size={14} className="text-primary" />
+                  <p className="text-xs font-semibold text-text-secondary">
+                    {t("templates.saved_meals")}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  {savedMeals.map((meal) => (
+                    <button
+                      key={meal.id}
+                      onClick={() => onSelectSavedMeal(meal)}
+                      className="w-full text-left bg-primary/5 border border-primary/10 rounded-2xl p-3 hover:bg-primary/10 transition-colors"
+                    >
+                      <p className="text-sm font-semibold text-text truncate">{meal.name}</p>
+                      <p className="text-[10px] text-text-secondary mt-0.5">
+                        {meal.foods.length} {t("templates.foods_count")} · {Math.round(meal.totalCalories)} kcal
+                        {" · "}P: {Math.round(meal.totalProtein)}g · C: {Math.round(meal.totalCarbs)}g · F: {Math.round(meal.totalFat)}g
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-1.5 mb-2 px-1">
               <Heart size={14} className="text-red-400" />
               <p className="text-xs font-semibold text-text-secondary">

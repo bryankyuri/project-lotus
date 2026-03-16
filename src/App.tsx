@@ -17,6 +17,7 @@ const EditProfilePage = lazy(() => import('./pages/EditProfilePage'))
 const EditTargetsPage = lazy(() => import('./pages/EditTargetsPage'))
 const InfoPage = lazy(() => import('./pages/InfoPage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const TemplatesPage = lazy(() => import('./pages/TemplatesPage'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -131,6 +132,19 @@ function AppRoutes() {
             ) : (
               <AppShell>
                 <SettingsPage />
+              </AppShell>
+            )
+          }
+        />
+
+        <Route
+          path="/templates"
+          element={
+            needsOnboarding ? (
+              <Navigate to="/onboarding" replace />
+            ) : (
+              <AppShell>
+                <TemplatesPage />
               </AppShell>
             )
           }

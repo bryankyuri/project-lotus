@@ -1,17 +1,25 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, ShoppingCart, Check } from 'lucide-react'
+import {
+  ChevronLeft, ChevronRight, ShoppingCart, Check,
+  Save, CalendarDays, CalendarRange, ClipboardList,
+} from 'lucide-react'
 import { useWeekPlan } from '../hooks/useWeekPlan'
 import { useDayLog } from '../hooks/useDayLog'
-import { storage, toDateKey, type SlotType } from '../store/localStorage'
-import { MealSlotCard, BottomSheet, FoodModal, EmptyState, Button } from '../components/ui'
+import { useTemplates } from '../hooks/useTemplates'
+import { storage, toDateKey, type SlotType, type LoggedFood, type DayTemplate, type WeekTemplate } from '../store/localStorage'
+import { MealSlotCard, BottomSheet, FoodModal, EmptyState, Button, useToast } from '../components/ui'
 import { variants, stagger } from '../utils/animations'
 import { FoodAddSheet } from './sheets/FoodAddSheet'
-import type { LoggedFood } from '../store/localStorage'
+import { SaveTemplateSheet } from './sheets/SaveTemplateSheet'
+import { LoadDayTemplateSheet, LoadWeekTemplateSheet } from './sheets/LoadTemplateSheet'
 
 export default function PlanPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const toast = useToast()
 
   // Week navigation
   const [weekOffset, setWeekOffset] = useState(0)
@@ -21,14 +29,17 @@ export default function PlanPage() {
     return d
   }, [weekOffset])
 
-  const { weekDates, weekSummary, groceryItems } = useWeekPlan(referenceDate)
+  const { weekDates, weekLogs, weekSummary, groceryItems } = useWeekPlan(referenceDate)
 
   // Selected day — default to today if visible in the current week
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = toDateKey()
     return weekDates.includes(today) ? today : weekDates[0]
   })
-  const { dayLog, addFood, removeFood } = useDayLog(selectedDate)
+  const { dayLog, addFood, removeFood, refresh: refreshDay } = useDayLog(selectedDate)
+
+  // Templates
+  const templates = useTemplates()
 
   // Grocery sheet
   const [showGrocery, setShowGrocery] = useState(false)
@@ -37,11 +48,58 @@ export default function PlanPage() {
   // Add food sheet
   const [addingSlot, setAddingSlot] = useState<SlotType | null>(null)
 
+  // Template sheets
+  const [saveMealSlot, setSaveMealSlot] = useState<{ slot: SlotType; foods: LoggedFood[] } | null>(null)
+  const [showSaveDaySheet, setShowSaveDaySheet] = useState(false)
+  const [showSaveWeekSheet, setShowSaveWeekSheet] = useState(false)
+  const [showLoadDaySheet, setShowLoadDaySheet] = useState(false)
+  const [showLoadWeekSheet, setShowLoadWeekSheet] = useState(false)
+
   const handleFoodSelected = (food: LoggedFood) => {
     if (addingSlot) {
       addFood(addingSlot, food)
       setAddingSlot(null)
     }
+  }
+
+  // ── Template handlers ──
+
+  const handleSaveMeal = (slot: SlotType, foods: LoggedFood[]) => {
+    setSaveMealSlot({ slot, foods })
+  }
+
+  const handleSaveMealConfirm = (name: string) => {
+    if (saveMealSlot) {
+      templates.saveMeal(name, saveMealSlot.slot, saveMealSlot.foods)
+      setSaveMealSlot(null)
+      toast.toast(t('templates.saved_success'))
+    }
+  }
+
+  const handleSaveDayConfirm = (name: string) => {
+    templates.saveDayTemplate(name, dayLog)
+    setShowSaveDaySheet(false)
+    toast.toast(t('templates.saved_success'))
+  }
+
+  const handleSaveWeekConfirm = (name: string) => {
+    templates.saveWeekTemplate(name, weekDates, weekLogs)
+    setShowSaveWeekSheet(false)
+    toast.toast(t('templates.saved_success'))
+  }
+
+  const handleLoadDay = (template: DayTemplate, mode: 'replace' | 'append') => {
+    templates.applyDayTemplate(selectedDate, template, mode)
+    setShowLoadDaySheet(false)
+    refreshDay()
+    toast.toast(t('templates.saved_success'))
+  }
+
+  const handleLoadWeek = (template: WeekTemplate) => {
+    templates.applyWeekTemplate(weekDates, template)
+    setShowLoadWeekSheet(false)
+    refreshDay()
+    toast.toast(t('templates.saved_success'))
   }
 
   const toggleGroceryItem = (id: string) => {
@@ -61,14 +119,24 @@ export default function PlanPage() {
       {/* Header */}
       <motion.div variants={variants.fadeInUp} initial="initial" animate="animate" className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text">{t('plan.title')}</h1>
-        <Button
-          variant="secondary"
-          size="sm"
-          icon={<ShoppingCart size={14} />}
-          onClick={() => setShowGrocery(true)}
-        >
-          {t('plan.grocery_list')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<ClipboardList size={14} />}
+            onClick={() => navigate('/templates')}
+          >
+            {t('templates.title')}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<ShoppingCart size={14} />}
+            onClick={() => setShowGrocery(true)}
+          >
+            {t('plan.grocery_list')}
+          </Button>
+        </div>
       </motion.div>
 
       {/* Week navigation */}
@@ -110,6 +178,38 @@ export default function PlanPage() {
         })}
       </div>
 
+      {/* Template quick-actions */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setShowSaveDaySheet(true)}
+          className="flex items-center gap-1.5 text-xs font-medium text-text-secondary bg-white rounded-xl px-3 py-1.5 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <Save size={12} />
+          {t('templates.save_day')}
+        </button>
+        <button
+          onClick={() => setShowLoadDaySheet(true)}
+          className="flex items-center gap-1.5 text-xs font-medium text-text-secondary bg-white rounded-xl px-3 py-1.5 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <CalendarDays size={12} />
+          {t('templates.load_day')}
+        </button>
+        <button
+          onClick={() => setShowSaveWeekSheet(true)}
+          className="flex items-center gap-1.5 text-xs font-medium text-text-secondary bg-white rounded-xl px-3 py-1.5 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <Save size={12} />
+          {t('templates.save_week')}
+        </button>
+        <button
+          onClick={() => setShowLoadWeekSheet(true)}
+          className="flex items-center gap-1.5 text-xs font-medium text-text-secondary bg-white rounded-xl px-3 py-1.5 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <CalendarRange size={12} />
+          {t('templates.load_week')}
+        </button>
+      </div>
+
       {/* Day's meal slots */}
       <motion.div
         key={selectedDate}
@@ -125,6 +225,7 @@ export default function PlanPage() {
               foods={dayLog[slot]}
               onAddFood={() => setAddingSlot(slot)}
               onRemoveFood={(index) => removeFood(slot, index)}
+              onSaveMeal={handleSaveMeal}
             />
           </motion.div>
         ))}
@@ -176,8 +277,85 @@ export default function PlanPage() {
         onClose={() => setAddingSlot(null)}
         title={addingSlot ? t(`today.${addingSlot}`) + ' — ' + t('today.add_food') : ''}
       >
-        {addingSlot && <FoodAddSheet onSelect={handleFoodSelected} />}
+        {addingSlot && (
+          <FoodAddSheet
+            onSelect={handleFoodSelected}
+            savedMeals={templates.getMealsForSlot(addingSlot)}
+            onSelectSavedMeal={(meal) => {
+              meal.foods.forEach((f) => addFood(addingSlot, f))
+              setAddingSlot(null)
+              toast.toast(t('templates.saved_success'))
+            }}
+          />
+        )}
       </FoodModal>
+
+      {/* Save Meal Sheet */}
+      <BottomSheet
+        open={saveMealSlot !== null}
+        onClose={() => setSaveMealSlot(null)}
+        title={t('templates.save_meal')}
+      >
+        {saveMealSlot && (
+          <SaveTemplateSheet
+            type="meal"
+            onSave={handleSaveMealConfirm}
+            onCancel={() => setSaveMealSlot(null)}
+          />
+        )}
+      </BottomSheet>
+
+      {/* Save Day Sheet */}
+      <BottomSheet
+        open={showSaveDaySheet}
+        onClose={() => setShowSaveDaySheet(false)}
+        title={t('templates.save_day')}
+      >
+        <SaveTemplateSheet
+          type="day"
+          onSave={handleSaveDayConfirm}
+          onCancel={() => setShowSaveDaySheet(false)}
+        />
+      </BottomSheet>
+
+      {/* Save Week Sheet */}
+      <BottomSheet
+        open={showSaveWeekSheet}
+        onClose={() => setShowSaveWeekSheet(false)}
+        title={t('templates.save_week')}
+      >
+        <SaveTemplateSheet
+          type="week"
+          onSave={handleSaveWeekConfirm}
+          onCancel={() => setShowSaveWeekSheet(false)}
+        />
+      </BottomSheet>
+
+      {/* Load Day Template Sheet */}
+      <BottomSheet
+        open={showLoadDaySheet}
+        onClose={() => setShowLoadDaySheet(false)}
+        title={t('templates.load_day')}
+      >
+        <LoadDayTemplateSheet
+          templates={templates.dayTemplates}
+          onSelect={handleLoadDay}
+          onDelete={(id) => templates.deleteDayTemplate(id)}
+        />
+      </BottomSheet>
+
+      {/* Load Week Template Sheet */}
+      <BottomSheet
+        open={showLoadWeekSheet}
+        onClose={() => setShowLoadWeekSheet(false)}
+        title={t('templates.load_week')}
+      >
+        <LoadWeekTemplateSheet
+          templates={templates.weekTemplates}
+          onSelect={handleLoadWeek}
+          onDelete={(id) => templates.deleteWeekTemplate(id)}
+        />
+      </BottomSheet>
     </div>
   )
 }

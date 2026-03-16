@@ -323,5 +323,31 @@
     "language": "Sprache",
     "language_desc": "Wähle deine bevorzugte Sprache",
     "settings_desc": "Sprache, Design und Einstellungen"
+  },
+  "templates": {
+    "title": "Meine Vorlagen",
+    "saved_meals": "Gespeicherte Mahlzeiten",
+    "day_templates": "Tagesvorlagen",
+    "week_templates": "Wochenvorlagen",
+    "save_meal": "Als Mahlzeit speichern",
+    "save_day": "Tag speichern",
+    "save_week": "Woche speichern",
+    "load_day": "Tag laden",
+    "load_week": "Woche laden",
+    "name_label": "Vorlagenname",
+    "name_placeholder": "z.B. Mein gesundes Frühstück",
+    "replace_confirm": "Wie möchtest du diese Vorlage anwenden?",
+    "add_to_existing": "Zum Bestehenden hinzufügen",
+    "replace": "Ersetzen",
+    "replace_week_confirm": "Der gesamte Wochenplan wird ersetzt. Fortfahren?",
+    "empty_meals": "Keine gespeicherten Mahlzeiten",
+    "empty_days": "Keine Tagesvorlagen",
+    "empty_weeks": "Keine Wochenvorlagen",
+    "foods_count": "Lebensmittel",
+    "days_filled": "Tage geplant",
+    "total": "Gesamt",
+    "per_day": "Tag",
+    "saved_success": "Erfolgreich gespeichert!",
+    "rename": "Vorlage umbenennen"
   }
 }

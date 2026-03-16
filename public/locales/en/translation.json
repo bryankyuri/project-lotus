@@ -323,5 +323,31 @@
     "language": "Language",
     "language_desc": "Choose your preferred language",
     "settings_desc": "Language, theme and preferences"
+  },
+  "templates": {
+    "title": "My Templates",
+    "saved_meals": "Saved Meals",
+    "day_templates": "Day Templates",
+    "week_templates": "Week Templates",
+    "save_meal": "Save as Meal",
+    "save_day": "Save Day",
+    "save_week": "Save Week",
+    "load_day": "Load Day",
+    "load_week": "Load Week",
+    "name_label": "Template Name",
+    "name_placeholder": "e.g. My Healthy Breakfast",
+    "replace_confirm": "How would you like to apply this template?",
+    "add_to_existing": "Add to Existing",
+    "replace": "Replace",
+    "replace_week_confirm": "This will replace the entire week's plan. Continue?",
+    "empty_meals": "No saved meals yet",
+    "empty_days": "No day templates yet",
+    "empty_weeks": "No week templates yet",
+    "foods_count": "foods",
+    "days_filled": "days planned",
+    "total": "Total",
+    "per_day": "day",
+    "saved_success": "Saved successfully!",
+    "rename": "Rename Template"
   }
 }

@@ -323,5 +323,31 @@
     "language": "言語",
     "language_desc": "お好みの言語を選択",
     "settings_desc": "言語、テーマ、設定"
+  },
+  "templates": {
+    "title": "マイテンプレート",
+    "saved_meals": "保存済みの食事",
+    "day_templates": "日テンプレート",
+    "week_templates": "週テンプレート",
+    "save_meal": "食事として保存",
+    "save_day": "日を保存",
+    "save_week": "週を保存",
+    "load_day": "日を読み込み",
+    "load_week": "週を読み込み",
+    "name_label": "テンプレート名",
+    "name_placeholder": "例：ヘルシー朝食",
+    "replace_confirm": "このテンプレートをどのように適用しますか？",
+    "add_to_existing": "既存に追加",
+    "replace": "置き換え",
+    "replace_week_confirm": "週全体の計画が置き換えられます。続けますか？",
+    "empty_meals": "保存済みの食事はありません",
+    "empty_days": "日テンプレートはありません",
+    "empty_weeks": "週テンプレートはありません",
+    "foods_count": "品",
+    "days_filled": "日計画済み",
+    "total": "合計",
+    "per_day": "日",
+    "saved_success": "保存しました！",
+    "rename": "テンプレート名を変更"
   }
 }

@@ -9,6 +9,9 @@ const STORAGE_KEYS = {
   LANGUAGE: 'mp_language',
   GROCERY_CHECKED: 'mp_grocery_checked',
   ONBOARDING_DONE: 'mp_onboarding_done',
+  SAVED_MEALS: 'mp_saved_meals',
+  DAY_TEMPLATES: 'mp_day_templates',
+  WEEK_TEMPLATES: 'mp_week_templates',
 } as const
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS]
@@ -69,6 +72,47 @@ export interface NutritionTargets {
 
 export interface AppSettings {
   language: string
+}
+
+// ─── Template Types ──────────────────────────────────────
+
+export type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+
+/** Level 1 — A saved group of foods for a single meal slot */
+export interface SavedMeal {
+  id: string
+  name: string
+  slot: SlotType
+  foods: LoggedFood[]
+  totalCalories: number
+  totalProtein: number
+  totalCarbs: number
+  totalFat: number
+  createdAt: string
+}
+
+/** Level 2 — A saved full-day plan */
+export interface DayTemplate {
+  id: string
+  name: string
+  breakfast: LoggedFood[]
+  lunch: LoggedFood[]
+  dinner: LoggedFood[]
+  snack: LoggedFood[]
+  totalCalories: number
+  totalProtein: number
+  totalCarbs: number
+  totalFat: number
+  createdAt: string
+}
+
+/** Level 3 — A saved 7-day plan */
+export interface WeekTemplate {
+  id: string
+  name: string
+  days: Record<DayKey, DayTemplate | null>
+  totalCalories: number
+  createdAt: string
 }
 
 // ─── Defaults ────────────────────────────────────────────
@@ -204,6 +248,60 @@ export const storage = {
     const all = storage.getAllExerciseLogs()
     all[date] = (all[date] ?? []).filter((e) => e.id !== id)
     set(STORAGE_KEYS.EXERCISES, all)
+  },
+
+  // ── Saved Meals ──
+  getSavedMeals: (): SavedMeal[] => get(STORAGE_KEYS.SAVED_MEALS, []),
+  setSavedMeals: (meals: SavedMeal[]) => set(STORAGE_KEYS.SAVED_MEALS, meals),
+
+  addSavedMeal: (meal: SavedMeal) => {
+    const all = storage.getSavedMeals()
+    storage.setSavedMeals([...all, meal])
+  },
+
+  updateSavedMeal: (id: string, updates: Partial<Omit<SavedMeal, 'id'>>) => {
+    const all = storage.getSavedMeals()
+    storage.setSavedMeals(all.map((m) => (m.id === id ? { ...m, ...updates } : m)))
+  },
+
+  deleteSavedMeal: (id: string) => {
+    storage.setSavedMeals(storage.getSavedMeals().filter((m) => m.id !== id))
+  },
+
+  // ── Day Templates ──
+  getDayTemplates: (): DayTemplate[] => get(STORAGE_KEYS.DAY_TEMPLATES, []),
+  setDayTemplates: (templates: DayTemplate[]) => set(STORAGE_KEYS.DAY_TEMPLATES, templates),
+
+  addDayTemplate: (template: DayTemplate) => {
+    const all = storage.getDayTemplates()
+    storage.setDayTemplates([...all, template])
+  },
+
+  updateDayTemplate: (id: string, updates: Partial<Omit<DayTemplate, 'id'>>) => {
+    const all = storage.getDayTemplates()
+    storage.setDayTemplates(all.map((t) => (t.id === id ? { ...t, ...updates } : t)))
+  },
+
+  deleteDayTemplate: (id: string) => {
+    storage.setDayTemplates(storage.getDayTemplates().filter((t) => t.id !== id))
+  },
+
+  // ── Week Templates ──
+  getWeekTemplates: (): WeekTemplate[] => get(STORAGE_KEYS.WEEK_TEMPLATES, []),
+  setWeekTemplates: (templates: WeekTemplate[]) => set(STORAGE_KEYS.WEEK_TEMPLATES, templates),
+
+  addWeekTemplate: (template: WeekTemplate) => {
+    const all = storage.getWeekTemplates()
+    storage.setWeekTemplates([...all, template])
+  },
+
+  updateWeekTemplate: (id: string, updates: Partial<Omit<WeekTemplate, 'id'>>) => {
+    const all = storage.getWeekTemplates()
+    storage.setWeekTemplates(all.map((t) => (t.id === id ? { ...t, ...updates } : t)))
+  },
+
+  deleteWeekTemplate: (id: string) => {
+    storage.setWeekTemplates(storage.getWeekTemplates().filter((t) => t.id !== id))
   },
 
   // ── Clear all ──

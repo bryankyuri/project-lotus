@@ -323,5 +323,31 @@
     "language": "اللغة",
     "language_desc": "اختر لغتك المفضلة",
     "settings_desc": "اللغة والمظهر والتفضيلات"
+  },
+  "templates": {
+    "title": "قوالبي",
+    "saved_meals": "الوجبات المحفوظة",
+    "day_templates": "قوالب اليوم",
+    "week_templates": "قوالب الأسبوع",
+    "save_meal": "حفظ كوجبة",
+    "save_day": "حفظ اليوم",
+    "save_week": "حفظ الأسبوع",
+    "load_day": "تحميل اليوم",
+    "load_week": "تحميل الأسبوع",
+    "name_label": "اسم القالب",
+    "name_placeholder": "مثال: فطوري الصحي",
+    "replace_confirm": "كيف تريد تطبيق هذا القالب؟",
+    "add_to_existing": "إضافة للموجود",
+    "replace": "استبدال",
+    "replace_week_confirm": "سيتم استبدال خطة الأسبوع بالكامل. متابعة؟",
+    "empty_meals": "لا توجد وجبات محفوظة بعد",
+    "empty_days": "لا توجد قوالب يومية بعد",
+    "empty_weeks": "لا توجد قوالب أسبوعية بعد",
+    "foods_count": "أطعمة",
+    "days_filled": "أيام مخططة",
+    "total": "الإجمالي",
+    "per_day": "يوم",
+    "saved_success": "تم الحفظ بنجاح!",
+    "rename": "إعادة تسمية القالب"
   }
 }

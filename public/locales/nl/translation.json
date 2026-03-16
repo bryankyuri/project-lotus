@@ -323,5 +323,31 @@
     "language": "Taal",
     "language_desc": "Kies je gewenste taal",
     "settings_desc": "Taal, thema en voorkeuren"
+  },
+  "templates": {
+    "title": "Mijn Sjablonen",
+    "saved_meals": "Opgeslagen Maaltijden",
+    "day_templates": "Dagsjablonen",
+    "week_templates": "Weeksjablonen",
+    "save_meal": "Opslaan als Maaltijd",
+    "save_day": "Dag Opslaan",
+    "save_week": "Week Opslaan",
+    "load_day": "Dag Laden",
+    "load_week": "Week Laden",
+    "name_label": "Sjabloonnaam",
+    "name_placeholder": "bijv. Mijn Gezond Ontbijt",
+    "replace_confirm": "Hoe wil je dit sjabloon toepassen?",
+    "add_to_existing": "Toevoegen aan bestaand",
+    "replace": "Vervangen",
+    "replace_week_confirm": "Dit vervangt het hele weekplan. Doorgaan?",
+    "empty_meals": "Nog geen opgeslagen maaltijden",
+    "empty_days": "Nog geen dagsjablonen",
+    "empty_weeks": "Nog geen weeksjablonen",
+    "foods_count": "voedingsmiddelen",
+    "days_filled": "dagen gepland",
+    "total": "Totaal",
+    "per_day": "dag",
+    "saved_success": "Succesvol opgeslagen!",
+    "rename": "Sjabloon hernoemen"
   }
 }
